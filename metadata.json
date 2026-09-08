@@ -1,0 +1,6 @@
+{
+  "name": "Trans-Africa Logistics",
+  "description": "Offline-first cross-border trucking logistics and freight matching platform for Southern Africa (SADC corridors).",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

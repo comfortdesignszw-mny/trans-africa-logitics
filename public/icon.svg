@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background container with squircle -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)" />
+
+  <!-- Subtle corridor highway grid lines -->
+  <path d="M60 410 L220 280 L290 280 L450 410" stroke="#334155" stroke-width="4" stroke-dasharray="12 12" fill="none" opacity="0.6"/>
+  <path d="M256 280 L256 410" stroke="#f97316" stroke-width="5" stroke-dasharray="16 16" fill="none" opacity="0.8"/>
+
+  <!-- Stylized Modern Heavy Duty SADC Truck Silhouette -->
+  <!-- Trailer Body -->
+  <rect x="90" y="160" width="220" height="150" rx="12" fill="#334155" />
+  <rect x="100" y="170" width="200" height="130" rx="8" fill="#1e293b" stroke="#475569" stroke-width="3" />
+  
+  <!-- Cargo Stripes / Corridor Lines -->
+  <path d="M120 185 L280 185" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+  <path d="M120 205 L240 205" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" />
+  <text x="120" y="260" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="32" letter-spacing="3">TRANS</text>
+  <text x="120" y="285" fill="#f97316" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="20" letter-spacing="6">AFRICA</text>
+
+  <!-- Truck Cab -->
+  <path d="M315 200 L370 200 C390 200 405 215 410 235 L425 280 C428 290 422 310 410 310 L315 310 Z" fill="url(#accentGrad)" />
+  <!-- Cab Windshield -->
+  <path d="M335 212 L372 212 C382 212 390 220 393 230 L405 260 L335 260 Z" fill="#0f172a" />
+  <!-- Cab Side Door & Mirror -->
+  <line x1="365" y1="260" x2="365" y2="300" stroke="#c2410c" stroke-width="3" />
+  <rect x="406" y="226" width="6" height="18" rx="2" fill="#fdba74" />
+  <!-- Headlight -->
+  <polygon points="423,285 435,288 435,296 420,296" fill="#fef08a" />
+
+  <!-- Wheels -->
+  <!-- Trailer Wheels -->
+  <circle cx="140" cy="325" r="32" fill="#020617" stroke="#64748b" stroke-width="8" />
+  <circle cx="140" cy="325" r="14" fill="#94a3b8" />
+  <circle cx="210" cy="325" r="32" fill="#020617" stroke="#64748b" stroke-width="8" />
+  <circle cx="210" cy="325" r="14" fill="#94a3b8" />
+  <circle cx="270" cy="325" r="32" fill="#020617" stroke="#64748b" stroke-width="8" />
+  <circle cx="270" cy="325" r="14" fill="#94a3b8" />
+  
+  <!-- Front Cab Wheels -->
+  <circle cx="375" cy="325" r="32" fill="#020617" stroke="#ea580c" stroke-width="8" />
+  <circle cx="375" cy="325" r="14" fill="#fed7aa" />
+
+  <!-- SADC Cross-Border Route Pin Indicator -->
+  <g transform="translate(370, 75)">
+    <circle cx="40" cy="40" r="42" fill="#10b981" opacity="0.2"/>
+    <circle cx="40" cy="40" r="32" fill="url(#emeraldGrad)" />
+    <!-- GPS Location Pin -->
+    <path d="M40 22 C32 22 26 28 26 36 C26 47 40 58 40 58 C40 58 54 47 54 36 C54 28 48 22 40 22 Z" fill="#ffffff" />
+    <circle cx="40" cy="34" r="4" fill="#059669" />
+  </g>
+</svg>
