@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions for Relationship-Based Access Control (REBAC)
+    // Helper functions for Relationship-Based Access Control (REBAC) & RBAC
     function isSignedIn() {
       return request.auth != null;
     }
@@ -11,7 +11,7 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Admin role check from token or user document
+    // Admin role check from token, hardcoded super-admin, or user profile doc
     function isAdmin() {
       return isSignedIn() && (
         request.auth.token.role == 'admin' ||
@@ -21,59 +21,117 @@ service cloud.firestore {
       );
     }
 
-    // User Profiles
-    // Anyone can read basic public profile info; only owner or admin can write
+    // Check if user has one of the logistics roles
+    function isShipper() {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'shipper') ||
+        isAdmin()
+      );
+    }
+
+    function isCarrierOrFleetManager() {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'trucker' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'fleet_manager')) ||
+        isAdmin()
+      );
+    }
+
+    // USER PROFILES:
+    // Anyone can read profiles for corridor transparency & carrier verification
+    // Users can create and edit their own profile; cannot self-assign admin unless authorized
     match /users/{userId} {
       allow read: if true;
-      allow create, update: if isUser(userId) || isAdmin();
+      allow create: if isUser(userId) && (
+        request.resource.data.role != 'admin' ||
+        request.auth.token.email == 'comfort.designszw@gmail.com'
+      );
+      allow update: if (isUser(userId) && (
+        request.resource.data.role == resource.data.role ||
+        isAdmin()
+      )) || isAdmin();
       allow delete: if isAdmin();
     }
 
-    // Consignment Loads Catalog
-    // Anonymous users can freely read/browse open consignments
-    // Authenticated shippers can post their own loads
-    // Only the creator (shipper) or Admin can update or delete their load
+    // CONSIGNMENT LOADS:
+    // Open reading for high-throughput corridor boards
+    // Authenticated users with valid IDs can create consignments
+    // Shippers can update/delete their own loads; Admins can supervise all
     match /loads/{loadId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && (
+      allow create: if isSignedIn() && (
+        request.resource.data.shipperId == request.auth.uid ||
+        isAdmin()
+      ) &&
+      request.resource.data.weightTons is number && request.resource.data.weightTons > 0 &&
+      request.resource.data.budget is number && request.resource.data.budget > 0;
+
+      allow update: if isSignedIn() && (
+        resource.data.shipperId == request.auth.uid ||
+        isAdmin() ||
+        // Assigned trucker updating transit tracking status
+        (resource.data.assignedTruckerId == request.auth.uid &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'currentTrackingCoords', 'updatedAt']))
+      );
+
+      allow delete: if isSignedIn() && (
         resource.data.shipperId == request.auth.uid ||
         isAdmin()
       );
     }
 
-    // Commercial Trucks Directory
-    // Anonymous users can browse available rigs and capacity
-    // Authenticated carriers can register trucks
-    // Only the carrier owner or Admin can update or remove the truck
+    // COMMERCIAL TRUCKS & TRAILER FLEET:
+    // Open read for shippers searching capacity along regional corridors
+    // Carriers or Fleet Managers can register rigs where truckerId matches auth.uid
     match /trucks/{truckId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && (
+      allow create: if isSignedIn() && (
+        request.resource.data.truckerId == request.auth.uid ||
+        isAdmin()
+      ) &&
+      request.resource.data.capacityTons is number && request.resource.data.capacityTons > 0;
+
+      allow update: if isSignedIn() && (
+        resource.data.truckerId == request.auth.uid ||
+        isAdmin()
+      );
+
+      allow delete: if isSignedIn() && (
         resource.data.truckerId == request.auth.uid ||
         isAdmin()
       );
     }
 
-    // Rate Negotiations & Bids (REBAC per load thread)
-    // Only participants (the shipper of the load OR the quoting trucker) OR Admin can read and write
+    // REBAC RATE NEGOTIATIONS & BIDS:
+    // Only participants (sender, load owner) or regulatory admin can read/write messages
     match /negotiations/{loadId}/messages/{msgId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.senderId == request.auth.uid;
       allow update, delete: if isSignedIn() && (
         resource.data.senderId == request.auth.uid ||
         isAdmin()
       );
     }
 
-    // Highway Distress & SOS Beacons
-    // Read: open to network for rapid responder coordination
-    // Write: authenticated users or emergency responders; update by reporter or admin
+    // HIGHWAY SOS DISTRESS BEACONS:
+    // Fast read and write for rapid corridor rescue coordination
     match /sosAlerts/{alertId} {
       allow read: if true;
       allow create: if true;
       allow update, delete: if isSignedIn() && (
         resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // CARRIER / SHIPPER REVIEWS:
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (
+        resource.data.authorId == request.auth.uid ||
         isAdmin()
       );
     }

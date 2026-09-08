@@ -25,9 +25,12 @@ import {
   onSnapshot,
   query,
   orderBy,
+  deleteDoc,
+  limit,
+  getDocs,
 } from 'firebase/firestore';
 import firebaseConfigData from '../../firebase-applet-config.json';
-import { UserProfile, UserRole, SADCCountry } from '../types';
+import { UserProfile, UserRole, SADCCountry, LoadItem, TruckListing, ChatMessage } from '../types';
 
 export const firebaseConfig = {
   apiKey: firebaseConfigData.apiKey,
