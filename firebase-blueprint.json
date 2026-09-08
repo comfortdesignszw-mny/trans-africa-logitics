@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string", "description": "Unique user ID (auth uid)" },
+        "role": { "type": "string", "description": "User role: shipper, trucker, fleet_manager, or admin" },
+        "fullName": { "type": "string", "description": "User full name" },
+        "companyName": { "type": "string", "description": "Business or transporter company" },
+        "phone": { "type": "string", "description": "Contact phone number" },
+        "email": { "type": "string", "description": "Email address" },
+        "country": { "type": "string", "description": "Primary operating country in SADC" },
+        "kycStatus": { "type": "string", "description": "unverified, pending, or verified" },
+        "kycBadge": { "type": "string", "description": "Standard, Silver Verified, or Gold Corridor Transporter" },
+        "createdAt": { "type": "string", "description": "Account registration timestamp" }
+      }
+    },
+    "LoadItem": {
+      "collection": "loads",
+      "fields": {
+        "id": { "type": "string", "description": "Consignment load unique identifier" },
+        "title": { "type": "string", "description": "Consignment title and brief summary" },
+        "shipperId": { "type": "string", "description": "User ID of the posting shipper (owner)" },
+        "shipperName": { "type": "string", "description": "Name of the shipper" },
+        "shipperCompany": { "type": "string", "description": "Company name of shipper" },
+        "shipperPhone": { "type": "string", "description": "Contact phone for freight" },
+        "haulType": { "type": "string", "description": "domestic or cross_border" },
+        "cargoType": { "type": "string", "description": "Category of cargo" },
+        "weightTons": { "type": "number", "description": "Payload weight in metric tons" },
+        "budget": { "type": "number", "description": "Target freight payout" },
+        "currency": { "type": "string", "description": "Currency code (USD, ZAR, etc.)" },
+        "status": { "type": "string", "description": "open, matched, in_transit, delivered, cancelled" },
+        "createdAt": { "type": "string", "description": "ISO creation timestamp" }
+      }
+    },
+    "TruckListing": {
+      "collection": "trucks",
+      "fields": {
+        "id": { "type": "string", "description": "Truck unique identifier" },
+        "truckReg": { "type": "string", "description": "Vehicle registration license plate" },
+        "truckerId": { "type": "string", "description": "User ID of the carrier/owner" },
+        "truckerName": { "type": "string", "description": "Name of carrier operator" },
+        "companyName": { "type": "string", "description": "Haulage transporter enterprise" },
+        "truckType": { "type": "string", "description": "Trailer configuration" },
+        "capacityTons": { "type": "number", "description": "Maximum payload capacity in tons" },
+        "status": { "type": "string", "description": "available, booked, in_transit, maintenance" },
+        "haulScope": { "type": "string", "description": "domestic or cross_border" },
+        "createdAt": { "type": "string", "description": "Listing timestamp" }
+      }
+    },
+    "ChatMessage": {
+      "collection": "negotiations/{loadId}/messages",
+      "fields": {
+        "id": { "type": "string", "description": "Message / bid ID" },
+        "loadId": { "type": "string", "description": "Associated consignment load ID" },
+        "senderId": { "type": "string", "description": "UID of the participant sender" },
+        "senderName": { "type": "string", "description": "Display name of sender" },
+        "senderRole": { "type": "string", "description": "Role of the sender" },
+        "message": { "type": "string", "description": "Text message content" },
+        "type": { "type": "string", "description": "text, bid_offer, bid_accepted, bid_declined" },
+        "offerAmount": { "type": "number", "description": "Proposed bid price" },
+        "timestamp": { "type": "string", "description": "Creation timestamp" }
+      }
+    },
+    "SOSAlert": {
+      "collection": "sosAlerts",
+      "fields": {
+        "id": { "type": "string", "description": "SOS emergency identifier" },
+        "userId": { "type": "string", "description": "Reporter UID" },
+        "truckReg": { "type": "string", "description": "Truck license registration" },
+        "phone": { "type": "string", "description": "Distress callback phone" },
+        "emergencyType": { "type": "string", "description": "breakdown, medical, hijack_threat, accident" },
+        "status": { "type": "string", "description": "active or resolved" }
+      }
+    }
+  }
+}

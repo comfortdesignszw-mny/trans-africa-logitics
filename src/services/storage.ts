@@ -261,26 +261,32 @@ export const StorageService = {
     return { syncedCount, errors: 0 };
   },
 
+  saveLoads(loads: LoadItem[]): void {
+    storage.setItem(STORAGE_KEYS.LOADS, loads);
+  },
+
+  saveTrucks(trucks: TruckListing[]): void {
+    storage.setItem(STORAGE_KEYS.TRUCKS, trucks);
+  },
+
   // USER PROFILE & ROLE
   getUserProfile(): UserProfile {
-    const defaultProfile: UserProfile = {
-      id: 'usr-default-transporter',
+    const defaultGuestProfile: UserProfile = {
+      id: 'guest-anonymous-user',
       role: 'trucker',
-      fullName: 'Farai Dube',
-      companyName: 'Matopos Freight Express Ltd',
-      phone: '+263 77 410 8820',
-      email: 'operations@matoposfreight.co.zw',
+      fullName: 'Guest Visitor',
+      companyName: 'Browsing SADC Corridors',
+      phone: '',
+      email: '',
       country: 'Zimbabwe',
-      currentCoords: { lat: -22.3486, lng: 30.0401 }, // Musina / Beitbridge
-      kycStatus: 'verified',
-      kycBadge: 'Gold Corridor Transporter',
-      idNumber: '63-198201-P-44',
-      passportNumber: 'FN892110',
-      sadcPermitNo: 'CBRTA-SADC-2026-9921',
-      gitInsuranceValue: 150000,
+      currentCoords: { lat: -22.3486, lng: 30.0401 }, // Beitbridge corridor
+      kycStatus: 'unverified',
+      kycBadge: 'Standard',
+      isAnonymous: true,
+      authProvider: 'guest',
     };
 
-    return storage.getItem<UserProfile>(STORAGE_KEYS.USER_PROFILE, defaultProfile);
+    return storage.getItem<UserProfile>(STORAGE_KEYS.USER_PROFILE, defaultGuestProfile);
   },
 
   saveUserProfile(profile: UserProfile): void {

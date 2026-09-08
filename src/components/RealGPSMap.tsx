@@ -86,13 +86,16 @@ export const RealGPSMap: React.FC<RealGPSMapProps> = ({
 
     let tileUrl = '';
     let attribution = '';
+    const cartoApiKey = (import.meta.env.VITE_CARTO_API_KEY as string | undefined)?.trim();
+    const cartoKeyParam = cartoApiKey ? `?api_key=${encodeURIComponent(cartoApiKey)}` : '';
 
     if (tileLayerType === 'dark') {
-      tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-      attribution = '&copy; OpenStreetMap &copy; CARTO';
+      tileUrl = `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${cartoKeyParam}`;
+      attribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>';
     } else if (tileLayerType === 'streets') {
-      tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-      attribution = '&copy; OpenStreetMap contributors';
+      // CARTO Voyager raster/vector basemap
+      tileUrl = `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${cartoKeyParam}`;
+      attribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>';
     } else if (tileLayerType === 'satellite') {
       tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       attribution = 'Tiles &copy; Esri, Earthstar Geographics';
@@ -101,6 +104,7 @@ export const RealGPSMap: React.FC<RealGPSMapProps> = ({
     L.tileLayer(tileUrl, {
       attribution,
       maxZoom: 19,
+      subdomains: 'abcd',
     }).addTo(map);
   }, [tileLayerType]);
 
@@ -436,15 +440,35 @@ export const RealGPSMap: React.FC<RealGPSMapProps> = ({
           </div>
         </div>
 
-        {/* Right: Locate Me Button */}
-        <button
-          onClick={handleLocateMe}
-          disabled={locating}
-          className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 shadow-xl pointer-events-auto flex items-center gap-2 cursor-pointer transition"
-        >
-          <Crosshair className={`w-4 h-4 text-sky-400 ${locating ? 'animate-spin' : ''}`} />
-          {locating ? 'Acquiring GPS...' : userLocation ? 'GPS Locked' : 'Locate My Rig'}
-        </button>
+        {/* Right: CARTO Status & Locate Me Button */}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          {import.meta.env.VITE_CARTO_API_KEY ? (
+            <span
+              className="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold text-[11px] flex items-center gap-1.5 shadow-sm"
+              title="CARTO Maps API Key authenticated"
+            >
+              <Globe2 className="w-3.5 h-3.5 text-emerald-400" />
+              CARTO Active
+            </span>
+          ) : (
+            <span
+              className="px-2.5 py-1.5 rounded-xl bg-slate-900/90 text-slate-400 border border-slate-700 font-bold text-[11px] hidden sm:flex items-center gap-1.5 shadow-sm"
+              title="Using standard CARTO basemap layers"
+            >
+              <Globe2 className="w-3.5 h-3.5 text-slate-400" />
+              CARTO Basemap
+            </span>
+          )}
+
+          <button
+            onClick={handleLocateMe}
+            disabled={locating}
+            className="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 shadow-xl flex items-center gap-2 cursor-pointer transition"
+          >
+            <Crosshair className={`w-4 h-4 text-sky-400 ${locating ? 'animate-spin' : ''}`} />
+            {locating ? 'Acquiring GPS...' : userLocation ? 'GPS Locked' : 'Locate My Rig'}
+          </button>
+        </div>
       </div>
 
       {/* LEAFLET CONTAINER */}

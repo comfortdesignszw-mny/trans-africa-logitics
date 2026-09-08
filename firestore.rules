@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for Relationship-Based Access Control (REBAC)
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Admin role check from token or user document
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.role == 'admin' ||
+        request.auth.token.email == 'comfort.designszw@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // User Profiles
+    // Anyone can read basic public profile info; only owner or admin can write
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isUser(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Consignment Loads Catalog
+    // Anonymous users can freely read/browse open consignments
+    // Authenticated shippers can post their own loads
+    // Only the creator (shipper) or Admin can update or delete their load
+    match /loads/{loadId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (
+        resource.data.shipperId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Commercial Trucks Directory
+    // Anonymous users can browse available rigs and capacity
+    // Authenticated carriers can register trucks
+    // Only the carrier owner or Admin can update or remove the truck
+    match /trucks/{truckId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (
+        resource.data.truckerId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Rate Negotiations & Bids (REBAC per load thread)
+    // Only participants (the shipper of the load OR the quoting trucker) OR Admin can read and write
+    match /negotiations/{loadId}/messages/{msgId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (
+        resource.data.senderId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Highway Distress & SOS Beacons
+    // Read: open to network for rapid responder coordination
+    // Write: authenticated users or emergency responders; update by reporter or admin
+    match /sosAlerts/{alertId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+  }
+}

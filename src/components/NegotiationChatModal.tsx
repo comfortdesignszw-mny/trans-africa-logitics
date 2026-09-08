@@ -233,14 +233,14 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
                         </span>
                       </div>
 
-                      {/* Shipper can accept offer if not accepted yet */}
-                      {currentUser.role === 'shipper' && currentLoad.status === 'open' && (
+                      {/* Shipper or Admin can accept offer if not accepted yet */}
+                      {(currentUser.role === 'shipper' || currentUser.role === 'admin') && currentLoad.status === 'open' && (
                         <button
                           onClick={() => handleAcceptOffer(msg)}
                           className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>Accept Offer</span>
+                          <span>{currentUser.role === 'admin' ? 'Admin Authorize & Accept' : 'Accept Offer'}</span>
                         </button>
                       )}
                     </div>

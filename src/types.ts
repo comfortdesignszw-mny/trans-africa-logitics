@@ -281,4 +281,6 @@ export interface UserProfile {
   passportNumber?: string;
   sadcPermitNo?: string;
   gitInsuranceValue?: number;
+  isAnonymous?: boolean;
+  authProvider?: 'google' | 'phone' | 'email' | 'guest';
 }
